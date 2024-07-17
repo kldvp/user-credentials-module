@@ -63,6 +63,7 @@ export default function Signup() {
                     label="Email" 
                     variant="outlined" 
                     type="email"
+                    placeholder="admin@gmail.com"
                     error={emailError}
                     helperText={ emailError ? 'Email is required' : '' }
                     onChange={handleEmailChange}>
@@ -71,6 +72,7 @@ export default function Signup() {
                     id="name"
                     label="Name" 
                     variant="outlined" 
+                    placeholder="Tom"
                     type="name"
                     onChange={e => setName(e.target.value)}>
                 </TextField>
