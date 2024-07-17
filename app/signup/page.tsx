@@ -1,9 +1,11 @@
 'use client';
-import { Button, Stack, TextField, Link, Alert } from "@mui/material";
+import { Button, Stack, TextField, Link, Alert, CircularProgress } from "@mui/material";
 import Nextlink from 'next/link';
 import { useState, useEffect, useRef, SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
 import * as deploy from '../utils/constants';
+
+type FormElement = HTMLFormElement;
 
 export default function Signup() {
     const [email, setEmail] = useState('');
@@ -12,8 +14,9 @@ export default function Signup() {
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [ serverError, setServerError ] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const formRef = useRef(null);
+    const formRef = useRef<FormElement>(null);
 
     /**
      * Using useEffect 
@@ -72,6 +75,7 @@ export default function Signup() {
         }
 
         // handle signup
+        setLoading(true);
         let res: any = await fetch(`${deploy.config.backendUrl}/users/signup`, {
             method: 'POST',
             headers: {
@@ -84,6 +88,7 @@ export default function Signup() {
             })
         });
         res = await res.json();
+        setLoading(false);
         if (res && res.email) {
           await router.push('/signin');
         } else {
@@ -128,7 +133,11 @@ export default function Signup() {
                             : ''}
                     onChange={handlePasswordChange}>
                 </TextField>
-                <Button variant="contained" type="submit">Signup</Button>
+                <Button 
+                    variant="contained" 
+                    disabled={loading}
+                    startIcon={loading && <CircularProgress size={20} color="inherit" />}
+                    type="submit">Signup</Button>
                 <span>
                     Already have an account ?&nbsp;
                     <Link component={Nextlink} href="/signin" className="self-center">

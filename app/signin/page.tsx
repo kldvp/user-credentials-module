@@ -1,10 +1,9 @@
 'use client';
 import { Button, Stack, TextField, Link, Alert } from "@mui/material";
 import Nextlink from 'next/link';
-import { useState, SyntheticEvent } from "react";
+import { useState, useEffect, SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
-
-
+import * as deploy from '../utils/constants';
 
 
 export default function Signin() {
@@ -12,6 +11,7 @@ export default function Signin() {
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
+    const [ serverError, setServerError ] = useState('');
     const router = useRouter();
 
     const handleEmailChange = (event: any) => {
@@ -23,6 +23,14 @@ export default function Signin() {
         setPassword(event.target.value);
         setPasswordError(false);
     }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setServerError('');
+        }, 3000);
+    
+        return () => clearTimeout(timer);
+      }, [serverError]);
 
     const handleSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
@@ -39,11 +47,29 @@ export default function Signin() {
             return;
         }
 
-        await router.push('/home');
+        let res: any = await fetch(`${deploy.config.backendUrl}/users/signin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
+        res = await res.json();
+        if (res && res['access_token']) {
+          localStorage.setItem('accessToken', res['access_token']);
+          await router.push('/home');
+        } else {
+          setServerError(res['message']);
+        }
     }
 
     return (
         <form className="w-full max-w-xs" onSubmit={handleSubmit}>
+            { serverError && <Alert severity="error">{serverError}</Alert>}
             <Stack spacing={2}>
                 <h1>Login to your account</h1>
                 <TextField
