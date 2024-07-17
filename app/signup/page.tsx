@@ -1,25 +1,39 @@
 'use client';
 import { Button, Stack, TextField, Link, Alert } from "@mui/material";
 import Nextlink from 'next/link';
-import { useState, SyntheticEvent } from "react";
+import { useState, useEffect, useRef, SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
-
-
-
+import * as deploy from '../utils/constants';
 
 export default function Signup() {
-    const [ email, setEmail ] = useState('');
-    const [ name, setName ] = useState('');
-    const [ password, setPassword ] = useState('');
-    const [ emailError, setEmailError ] = useState(false);
-    const [ passwordError, setPasswordError ] = useState(false);
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
+    const [ serverError, setServerError ] = useState('');
     const router = useRouter();
+    const formRef = useRef(null);
+
+    /**
+     * Using useEffect 
+     * - To remove error message after 3 seconds delay
+     * - Reset form
+     */
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setServerError('');
+            formRef?.current?.reset();
+        }, 3000);
+    
+        return () => clearTimeout(timer);
+      }, [serverError]);
 
     const handleEmailChange = (event: any) => {
         setEmail(event.target.value);
         setEmailError(false);
     }
-    
+
     const handlePasswordChange = (event: any) => {
         setPassword(event.target.value);
         setPasswordError(false);
@@ -29,13 +43,20 @@ export default function Signup() {
         const specialCharactersRegex = new RegExp('[!@#$%^&*(),.?":{}|<>]');
         const numberRegex = new RegExp('\\d');
         const letterRegex = new RegExp('[a-zA-Z]');
-        return value 
+        return value
             && value.length >= 8 // password must be 8 characters minimum
             && numberRegex.test(value) // should contain atleast 1 number
             && letterRegex.test(value) // should contain atleast 1 letter
             && specialCharactersRegex.test(value); // should contain atleast 1 special character
     }
 
+    /**
+     * Form Submit handler
+     * - Client side validations on email & passsword will be processed
+     * - If all checks passed, it will try to create a new user account
+     * - If user created successfully, it will redirect to /signin page
+     * - If user not created or something went wrong, it will show error alert message
+     */
     const handleSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
         // client side validations
@@ -50,43 +71,61 @@ export default function Signup() {
             return;
         }
 
-        await router.push('/signin');
+        // handle signup
+        let res: any = await fetch(`${deploy.config.backendUrl}/users/signup`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
+        res = await res.json();
+        if (res && res.email) {
+          await router.push('/signin');
+        } else {
+          setServerError(res.message);
+        }
     }
 
     return (
-        <form className="w-full max-w-xs" onSubmit={handleSubmit}>
+        <form className="w-full max-w-xs" ref={formRef} onSubmit={handleSubmit}>
+            { serverError && <Alert severity="error">{serverError}</Alert>}
             <Stack spacing={2}>
                 <h1>Create your account</h1>
-                <TextField 
+                <TextField
                     required
                     id="email"
-                    label="Email" 
-                    variant="outlined" 
+                    label="Email"
+                    variant="outlined"
                     type="email"
                     placeholder="admin@gmail.com"
                     error={emailError}
-                    helperText={ emailError ? 'Email is required' : '' }
+                    helperText={emailError ? 'Email is required' : ''}
                     onChange={handleEmailChange}>
                 </TextField>
-                <TextField 
+                <TextField
                     id="name"
-                    label="Name" 
-                    variant="outlined" 
+                    label="Name"
+                    variant="outlined"
                     placeholder="Tom"
                     type="name"
                     onChange={e => setName(e.target.value)}>
                 </TextField>
-                <TextField 
+                <TextField
                     required
                     id="password"
-                    label="Password" 
-                    variant="outlined" 
-                    type="password" 
+                    label="Password"
+                    variant="outlined"
+                    type="password"
                     error={passwordError}
-                    helperText={ 
-                        passwordError ? 
-                        `Password must be 8 characters minimum, with at least one letter, one number, and one special character.`
-                        : '' }
+                    helperText={
+                        passwordError ?
+                            `Password must be 8 characters minimum, with at least one letter, one number, and one special character.`
+                            : ''}
                     onChange={handlePasswordChange}>
                 </TextField>
                 <Button variant="contained" type="submit">Signup</Button>
