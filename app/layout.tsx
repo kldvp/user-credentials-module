@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
+import { CssBaseline, Container, Box } from "@mui/material";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+      <Box className="h-screen flex items-center justify-center">
+        <AppRouterCacheProvider>
+          <CssBaseline>
+            {children}
+          </CssBaseline>
+        </AppRouterCacheProvider>
+      </Box>
+        </body>
     </html>
   );
 }
