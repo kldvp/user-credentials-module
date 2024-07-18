@@ -19,6 +19,9 @@ npm install
 
 ## Running the app
 
+> [!NOTE]  
+> Before starting this server, Please run backend service by following [link](https://github.com/kldvp/user-credentials-backend) here.
+
 Run the app by using following command
 
 ```bash
@@ -27,8 +30,6 @@ npm run dev
 
 Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
-> [!NOTE]  
-> Before starting this server, Please run backend service by following [link](https://github.com/kldvp/user-credentials-backend) here.
 
 
 ## Functionalities
