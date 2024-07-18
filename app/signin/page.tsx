@@ -1,5 +1,5 @@
 'use client';
-import { Button, Stack, TextField, Link, Alert } from "@mui/material";
+import { Button, Stack, TextField, Link, Alert, CircularProgress } from "@mui/material";
 import Nextlink from 'next/link';
 import { useState, useEffect, SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ export default function Signin() {
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [ serverError, setServerError ] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleEmailChange = (event: any) => {
@@ -47,6 +48,7 @@ export default function Signin() {
             return;
         }
 
+        setLoading(true);
         let res: any = await fetch(`${deploy.config.backendUrl}/users/signin`, {
             method: 'POST',
             headers: {
@@ -59,6 +61,7 @@ export default function Signin() {
             })
         });
         res = await res.json();
+        setLoading(false);
         if (res && res['access_token']) {
           localStorage.setItem('accessToken', res['access_token']);
           await router.push('/home');
@@ -94,7 +97,11 @@ export default function Signin() {
                             : ''}
                     onChange={handlePasswordChange}>
                 </TextField>
-                <Button variant="contained" type="submit">Signin</Button>
+                <Button 
+                variant="contained" 
+                disabled={loading}
+                startIcon={loading && <CircularProgress size={20} color="inherit" />}
+                type="submit">Signin</Button>
                 <span>
                     Does not have an account ? &nbsp;
                     <Link component={Nextlink} href="/signup" className="self-center">
