@@ -83,6 +83,7 @@ export default function Signup() {
             },
             credentials: 'include',
             body: JSON.stringify({
+                name,
                 email,
                 password
             })
