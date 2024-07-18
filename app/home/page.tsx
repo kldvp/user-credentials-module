@@ -20,6 +20,7 @@ export default function Home() {
     return;
   }
 
+  // fetch user details
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -44,6 +45,7 @@ export default function Home() {
       })
   }, [])
 
+  // if user not logged in show different page
   if (!isLoggedIn) {
     return (
       <span>
@@ -55,6 +57,8 @@ export default function Home() {
     )
   }
   if (isLoading) return <p>Loading...</p>
+
+  // If user logged in, show user details
   return (
     <main>
       <Stack spacing={2}>

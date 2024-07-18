@@ -33,10 +33,16 @@ export default function Signin() {
         return () => clearTimeout(timer);
       }, [serverError]);
 
+    /**
+     * 
+     * - Signin handler
+     * By giving email and password user can signin to their account
+     * Upon successful login, it will set access token to localstorage and 
+     * user can be redirected to /home route 
+     */
     const handleSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
         // client side validations
-        
         // email validation
         if (!email.trim()) {
             setEmailError(true);
