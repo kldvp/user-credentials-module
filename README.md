@@ -45,4 +45,6 @@ Open [http://localhost:3001](http://localhost:3001) with your browser to see the
 - Users can sign in by navigating to the `/signin` route.
 - Users can only access `/home` if they are already logged in.
 
+## Demo
+![usersignupsigninflow](https://github.com/user-attachments/assets/2c84ea4c-76e7-4f2b-bbcb-47ad7202452e)
 
